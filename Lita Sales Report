@@ -1,0 +1,68 @@
+SELECT TOP (1000) [OrderID]
+      ,[Customer_Id]
+      ,[Product]
+      ,[Region]
+      ,[OrderDate]
+      ,[Quantity]
+      ,[UnitPrice]
+      ,[Total_REVENUE]
+  FROM [lita_capstoe_project].[dbo].[lita_salesdata]
+
+
+  ----1.
+
+  SELECT 
+    product, 
+    SUM(CAST(quantity AS INT) * CAST(unitprice AS DECIMAL(10, 2))) AS totalsale
+FROM 
+    lita_salesdata
+GROUP BY 
+    product;
+
+
+	-----2
+	Select region, count(*) as NumberOfTransactions
+From lita_salesdata
+Group by region;
+
+-----3
+
+  select top 1 product, SUM(CAST(quantity AS INT) * CAST(unitprice AS DECIMAL(10, 2))) AS totalsale
+From lita_salesdata
+Group by product
+Order by Product desc;
+
+-----4
+ Select month(OrderDate) as month, SUM(CAST(quantity AS INT) * CAST(unitprice AS DECIMAL(10, 2))) as MonthlySales
+From lita_salesdata
+Where year(OrderDate) = year(GetDate())
+Group by month(OrderDate)
+Order by month;
+
+-----5
+Select top 5 customer_id, SUM(CAST(quantity AS INT) * CAST(unitprice AS DECIMAL(10, 2))) as totalpurchaseAmount
+From lita_salesdata
+Group by customer_id
+Order by TotalPurchaseAmount desc;
+
+----6
+SELECT 
+    region, 
+    SUM(CAST(quantity AS INT) * CAST(unitprice AS DECIMAL(10, 2))) AS totalsales,
+    SUM(CAST(quantity AS INT) * CAST(unitprice AS DECIMAL(10, 2))) * 1.0 /
+    (SELECT SUM(CAST(quantity AS INT) * CAST(unitprice AS DECIMAL(10, 2))) FROM lita_salesdata) 
+    AS PercentageOfTotalSales
+FROM 
+    lita_salesdata 
+GROUP BY 
+    region;
+
+	----7.
+	SELECT DISTINCT product
+FROM lita_salesdata
+WHERE product NOT IN (
+    SELECT product
+    FROM lita_salesdata
+    WHERE OrderDate >= DATEADD(quarter, -1, GETDATE()) 
+      AND OrderDate < GETDATE()
+);
